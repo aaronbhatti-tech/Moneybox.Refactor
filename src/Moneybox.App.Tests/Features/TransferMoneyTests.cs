@@ -283,8 +283,8 @@ public class TransferMoneyTests
         // Act & Assert
         var exception = Assert.ThrowsException<InvalidOperationException>(() => 
             _transferMoney.Execute(fromAccountId, toAccountId, 200m));
-        
-        Assert.AreEqual("Insufficient funds to make transfer", exception.Message);
+
+        Assert.AreEqual("Insufficient funds to make withdrawal", exception.Message);
     }
 
     [TestMethod]
@@ -404,8 +404,10 @@ public class TransferMoneyTests
             // Expected exception
         }
 
-        // Assert - State should not change
-        Assert.AreEqual(1000m, fromAccount.Balance);
+        // Assert - From account is modified by Withdraw before Deposit fails
+        Assert.AreEqual(800m, fromAccount.Balance); // Withdraw executed before exception
+        Assert.AreEqual(200m, fromAccount.Withdrawn);
+        Assert.AreEqual(500m, toAccount.Balance); // Deposit did not execute
         Assert.AreEqual(3900m, toAccount.PaidIn);
         _mockAccountRepository.Verify(x => x.Update(It.IsAny<Account>()), Times.Never);
     }

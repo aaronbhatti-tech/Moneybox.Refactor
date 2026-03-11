@@ -8,15 +8,15 @@ public class Account
     private const decimal LowFundsThreshold = 500m;
     private const decimal ApproachingPayInLimitThreshold = 500m;
 
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
-    public User User { get; init; }
+    public User User { get; set; }
 
-    public decimal Balance { get; private set; }
+    public decimal Balance { get; set; }
 
-    public decimal Withdrawn { get; private set; }
+    public decimal Withdrawn { get; set; }
 
-    public decimal PaidIn { get; private set; }
+    public decimal PaidIn { get; set; }
 
     internal bool Deposit(decimal amount)
     {
