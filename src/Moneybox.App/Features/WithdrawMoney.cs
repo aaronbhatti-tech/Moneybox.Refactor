@@ -1,13 +1,23 @@
-﻿using Moneybox.App.DataAccess;
+﻿namespace Moneybox.App.Features;
+
+using Moneybox.App.DataAccess;
+using Moneybox.App.Domain;
 using Moneybox.App.Domain.Services;
 using System;
-
-namespace Moneybox.App.Features;
 
 public class WithdrawMoney(IAccountRepository accountRepository, INotificationService notificationService)
 {
     public void Execute(Guid fromAccountId, decimal amount)
     {
-        // TODO:
+        Account account = accountRepository.GetAccountById(fromAccountId);
+
+        bool hasLowFunds = account.Withdraw(amount);
+
+        if (hasLowFunds)
+        {
+            notificationService.NotifyFundsLow(account.User.Email);
+        }
+
+        accountRepository.Update(account);
     }
 }
