@@ -25,3 +25,32 @@ As part of this process however, you should look to refactor some of the code in
 Once you have completed test, zip up your solution, excluding any build artifacts to reduce the size, and email it back to our recruitment team.
 
 Good luck!
+
+## Notes on the solution:
+This was a fun task to work on. 
+
+I started by writing tests for the current state to ensure a base level coverage as there were none.
+
+I then looked at the domain models and feature classes to identify any code smells and violations. The main ones for me were
+
+* The Account class was an anaemic domain model with no business logic.
+* The TransferMoney.Execute method is doing too much ie. validation, orchestration, business rules, exceptions - violating SRP amongst others.
+* The account properties were all public settable which could lead to misuse ie. invariant violations.
+* Other minor things such as the use of magic numbers, naming, etc.
+
+I then began refactoring by moving the business logic out of TransferMoney.Execute and into the Account domain model.
+
+I also made the properties private settable and added methods to manipulate the state of the account in a controlled way. 
+
+I kept the notification calls in the feature classes to keep the domain pure however the logic to determine whether to call the notification service was moved in the domain. 
+
+Finally, I implemented the WithdrawMoney.Execute method which was straightforward after the refactoring as most of the logic was already in place in the domain models and was able to reuse code which satisfied DRY principle.
+
+If I had more time I would
+* Look to introduce a locking mechanism to prevent race conditions when two or more callers are attempting to withdrawal or transfer money from the same account at the same time. 
+* Follow DDD principle of identifying an aggregate root and making it responsible for all child entities.
+* Have separated read/write models using CQRS pattern. 
+* Maybe introduce a factory for creating accounts to ensure they are initialised in valid state.
+* Raise domain events/handlers for things like low funds and limits reached which would decouple further the domain from it's callers.
+
+I used AI to help me write the initial tests, generate PR descriptions, and to give me ideas on how to refactor the code.
