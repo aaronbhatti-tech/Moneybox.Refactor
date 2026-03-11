@@ -48,7 +48,7 @@ Finally, I implemented the WithdrawMoney.Execute method which was straightforwar
 
 If I had more time I would
 * Look to introduce a locking mechanism to prevent race conditions when two or more callers are attempting to withdrawal or transfer money from the same account at the same time. 
-* Follow DDD principle of identifying an aggregate root and making it responsible for all child entities.
+* Follow DDD principle of identifying an aggregate root and making it responsible for all child entities in addition to value objects for amount/currency logic.
 * Have separated read/write models using CQRS pattern. 
 * Maybe introduce a factory for creating accounts to ensure they are initialised in valid state.
 * Raise domain events/handlers for things like low funds and limits reached which would decouple further the domain from it's callers.
