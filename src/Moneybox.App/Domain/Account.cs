@@ -4,9 +4,9 @@ using System;
 
 public class Account
 {
-    public const decimal PayInLimit = 4000m;
-    private const decimal LowFundsThreshold = 500m;
-    private const decimal ApproachingPayInLimitThreshold = 500m;
+    public const decimal MaxPayInAmount = 4000m;
+    private const decimal MinBalanceAmount = 500m;
+    private const decimal MaxPayInAmountWarningMargin = 500m;
 
     public Guid Id { get; set; }
 
@@ -22,7 +22,7 @@ public class Account
     {
         var newPaidIn = PaidIn + amount;
 
-        if (newPaidIn > PayInLimit)
+        if (newPaidIn > MaxPayInAmount)
         {
             throw new InvalidOperationException("Account pay in limit reached");
         }
@@ -30,7 +30,7 @@ public class Account
         Balance += amount;
         PaidIn = newPaidIn;
 
-        return (PayInLimit - newPaidIn) < ApproachingPayInLimitThreshold;
+        return (MaxPayInAmount - newPaidIn) < MaxPayInAmountWarningMargin;
     }
 
     internal bool Withdraw(decimal amount)
@@ -45,6 +45,6 @@ public class Account
         Balance = newBalance;
         Withdrawn += amount;
 
-        return newBalance < LowFundsThreshold;
+        return newBalance < MinBalanceAmount;
     }
 }

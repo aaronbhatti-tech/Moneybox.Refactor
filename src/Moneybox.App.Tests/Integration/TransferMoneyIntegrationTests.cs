@@ -82,7 +82,7 @@ public class TransferMoneyIntegrationTests
     }
 
     [TestMethod]
-    public void GivenTransfersApproachingPayInLimit_WhenTransferringToLimit_ThenNotificationSequenceIsTriggered()
+    public void GivenTransfersApproachingMaxPayInAmount_WhenTransferringToLimit_ThenNotificationSequenceIsTriggered()
     {
         // Arrange
         var fromAccount = new Account

@@ -63,7 +63,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void GivenBalanceWillFallBelow500_WhenTransferringMoney_ThenLowFundsNotificationIsSent()
+    public void GivenBalanceWillFallBelowMinBalance_WhenTransferringMoney_ThenLowFundsNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -97,7 +97,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void GivenBalanceWillBeExactly500_WhenTransferringMoney_ThenNoLowFundsNotificationIsSent()
+    public void GivenBalanceWillBeExactlyAtMinBalance_WhenTransferringMoney_ThenNoLowFundsNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -133,7 +133,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void GivenPayInWillBeWithin500OfLimit_WhenTransferringMoney_ThenPayInLimitNotificationIsSent()
+    public void GivenPayInWillBeWithinWarningMarginOfMaxPayIn_WhenTransferringMoney_ThenPayInLimitNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -170,7 +170,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void GivenPayInWillBeExactly500FromLimit_WhenTransferringMoney_ThenNoPayInLimitNotificationIsSent()
+    public void GivenPayInWillBeExactlyAtWarningMarginFromMaxPayIn_WhenTransferringMoney_ThenNoPayInLimitNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -322,7 +322,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void GivenPayInLimitWillBeExceeded_WhenTransferringMoney_ThenInvalidOperationExceptionIsThrown()
+    public void GivenMaxPayInAmountWillBeExceeded_WhenTransferringMoney_ThenInvalidOperationExceptionIsThrown()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -357,7 +357,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void GivenPayInLimitWillBeExceeded_WhenTransferAttempted_ThenFromAccountIsModifiedButRepositoryNotUpdated()
+    public void GivenMaxPayInAmountWillBeExceeded_WhenTransferAttempted_ThenFromAccountIsModifiedButRepositoryNotUpdated()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -403,7 +403,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void GivenPayInWillBeExactlyAtLimit_WhenTransferringMoney_ThenTransferSucceedsAndNotificationIsSent()
+    public void GivenPayInWillBeExactlyAtMaxPayInAmount_WhenTransferringMoney_ThenTransferSucceedsAndNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
