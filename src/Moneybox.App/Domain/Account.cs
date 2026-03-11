@@ -8,17 +8,35 @@ public class Account
     private const decimal MinBalanceAmount = 500m;
     private const decimal MaxPayInAmountWarningMargin = 500m;
 
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public User User { get; set; }
+    public User User { get; init; }
 
-    public decimal Balance { get; set; }
+    public decimal Balance { get; private set; }
 
-    public decimal Withdrawn { get; set; }
+    public decimal Withdrawn { get; private set; }
 
-    public decimal PaidIn { get; set; }
+    public decimal PaidIn { get; private set; }
 
-    internal bool Deposit(decimal amount)
+    public bool HasLowBalance => Balance < MinBalanceAmount;
+
+    public bool IsApproachingPayInLimit => 
+        (MaxPayInAmount - PaidIn) < MaxPayInAmountWarningMargin;
+
+    public Account()
+    {
+    }
+
+    public Account(Guid id, User user, decimal balance, decimal withdrawn, decimal paidIn)
+    {
+        Id = id;
+        User = user;
+        Balance = balance;
+        Withdrawn = withdrawn;
+        PaidIn = paidIn;
+    }
+
+    internal void Deposit(decimal amount)
     {
         var newPaidIn = PaidIn + amount;
 
@@ -29,11 +47,9 @@ public class Account
 
         Balance += amount;
         PaidIn = newPaidIn;
-
-        return (MaxPayInAmount - newPaidIn) < MaxPayInAmountWarningMargin;
     }
 
-    internal bool Withdraw(decimal amount)
+    internal void Withdraw(decimal amount)
     {
         decimal newBalance = Balance - amount;
 
@@ -44,7 +60,5 @@ public class Account
 
         Balance = newBalance;
         Withdrawn += amount;
-
-        return newBalance < MinBalanceAmount;
     }
 }

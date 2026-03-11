@@ -29,22 +29,10 @@ public class TransferMoneyTests
         // Arrange
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 1000m
-        };
+        var fromUser = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" };
+        var toUser = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" };
+        var fromAccount = new Account(fromAccountId, fromUser, 1000m, 0m, 0m);
+        var toAccount = new Account(toAccountId, toUser, 500m, 0m, 1000m);
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
@@ -69,22 +57,8 @@ public class TransferMoneyTests
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
         var fromEmail = "from@test.com";
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = fromEmail, Name = "From User" },
-            Balance = 600m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 1000m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = fromEmail, Name = "From User" }, 600m, 0m, 0m);
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 1000m);
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
@@ -103,23 +77,9 @@ public class TransferMoneyTests
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 700m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 700m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 1000m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 1000m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -140,23 +100,9 @@ public class TransferMoneyTests
         var toAccountId = Guid.NewGuid();
         var toEmail = "to@test.com";
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 1000m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = toEmail, Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 3600m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = toEmail, Name = "To User" }, 500m, 0m, 3600m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -176,23 +122,9 @@ public class TransferMoneyTests
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 1000m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 3000m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 3000m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -214,23 +146,9 @@ public class TransferMoneyTests
         var fromEmail = "from@test.com";
         var toEmail = "to@test.com";
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = fromEmail, Name = "From User" },
-            Balance = 600m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = fromEmail, Name = "From User" }, 600m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = toEmail, Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 3600m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = toEmail, Name = "To User" }, 500m, 0m, 3600m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -252,23 +170,9 @@ public class TransferMoneyTests
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 100m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 100m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 1000m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 1000m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -286,22 +190,8 @@ public class TransferMoneyTests
         // Arrange
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 100m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 1000m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 100m, 0m, 0m);
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 1000m);
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
@@ -328,23 +218,9 @@ public class TransferMoneyTests
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 1000m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 3900m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 3900m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -363,23 +239,9 @@ public class TransferMoneyTests
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 1000m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 3900m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 3900m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -410,23 +272,9 @@ public class TransferMoneyTests
         var toAccountId = Guid.NewGuid();
         var toEmail = "to@test.com";
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 1000m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = toEmail, Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 3500m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = toEmail, Name = "To User" }, 500m, 0m, 3500m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -448,23 +296,9 @@ public class TransferMoneyTests
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
 
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 1000m, 0m, 0m);
 
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 1000m
-        };
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 1000m);
 
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
@@ -482,14 +316,7 @@ public class TransferMoneyTests
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new Account
-        {
-            Id = accountId,
-            User = new User { Id = Guid.NewGuid(), Email = "user@test.com", Name = "User" },
-            Balance = 2000m,
-            Withdrawn = 100m,
-            PaidIn = 1000m
-        };
+        var account = new Account(accountId, new User { Id = Guid.NewGuid(), Email = "user@test.com", Name = "User" }, 2000m, 100m, 1000m);
         _mockAccountRepository.Setup(x => x.GetAccountById(accountId)).Returns(account);
 
         // Act
@@ -507,22 +334,8 @@ public class TransferMoneyTests
         // Arrange
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
-        var fromAccount = new Account
-        {
-            Id = fromAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var toAccount = new Account
-        {
-            Id = toAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 1000m
-        };
+        var fromAccount = new Account(fromAccountId, new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 1000m, 0m, 0m);
+        var toAccount = new Account(toAccountId, new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 500m, 0m, 1000m);
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
@@ -535,3 +348,7 @@ public class TransferMoneyTests
         _mockAccountRepository.Verify(x => x.Update(It.IsAny<Account>()), Times.Exactly(2));
     }
 }
+
+
+
+

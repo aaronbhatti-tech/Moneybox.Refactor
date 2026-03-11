@@ -28,32 +28,11 @@ public class TransferMoneyIntegrationTests
     public void GivenThreeAccounts_WhenPerformingMultipleTransfers_ThenDataIntegrityIsMaintained()
     {
         // Arrange
-        var account1 = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "user1@test.com", Name = "User 1" },
-            Balance = 3000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var account1 = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "user1@test.com", Name = "User 1" }, 3000m, 0m, 0m);
 
-        var account2 = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "user2@test.com", Name = "User 2" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var account2 = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "user2@test.com", Name = "User 2" }, 1000m, 0m, 0m);
 
-        var account3 = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "user3@test.com", Name = "User 3" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var account3 = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "user3@test.com", Name = "User 3" }, 500m, 0m, 0m);
 
         _accountRepository.AddAccount(account1);
         _accountRepository.AddAccount(account2);
@@ -85,22 +64,8 @@ public class TransferMoneyIntegrationTests
     public void GivenTransfersApproachingMaxPayInAmount_WhenTransferringToLimit_ThenNotificationSequenceIsTriggered()
     {
         // Arrange
-        var fromAccount = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 5000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var toAccount = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 3000m
-        };
+        var fromAccount = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 5000m, 0m, 0m);
+        var toAccount = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 1000m, 0m, 3000m);
         _accountRepository.AddAccount(fromAccount);
         _accountRepository.AddAccount(toAccount);
 
@@ -119,22 +84,8 @@ public class TransferMoneyIntegrationTests
     public void GivenLowBalanceAfterFirstTransfer_WhenAttemptingSecondLargeTransfer_ThenInsufficientFundsExceptionIsThrown()
     {
         // Arrange
-        var fromAccount = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" },
-            Balance = 600m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var toAccount = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var fromAccount = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "from@test.com", Name = "From User" }, 600m, 0m, 0m);
+        var toAccount = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "to@test.com", Name = "To User" }, 1000m, 0m, 0m);
         _accountRepository.AddAccount(fromAccount);
         _accountRepository.AddAccount(toAccount);
 
@@ -154,23 +105,9 @@ public class TransferMoneyIntegrationTests
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new Account
-        {
-            Id = accountId,
-            User = new User { Id = Guid.NewGuid(), Email = "user@test.com", Name = "User" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var account = new Account(accountId, new User { Id = Guid.NewGuid(), Email = "user@test.com", Name = "User" }, 1000m, 0m, 0m);
         var otherAccountId = Guid.NewGuid();
-        var otherAccount = new Account
-        {
-            Id = otherAccountId,
-            User = new User { Id = Guid.NewGuid(), Email = "other@test.com", Name = "Other" },
-            Balance = 500m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var otherAccount = new Account(otherAccountId, new User { Id = Guid.NewGuid(), Email = "other@test.com", Name = "Other" }, 500m, 0m, 0m);
         _accountRepository.AddAccount(account);
         _accountRepository.AddAccount(otherAccount);
 
@@ -188,30 +125,9 @@ public class TransferMoneyIntegrationTests
     public void GivenThreeAccountsWithSameBalance_WhenPerformingCircularTransfers_ThenAllBalancesReturnToOriginalAmounts()
     {
         // Arrange
-        var account1 = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "user1@test.com", Name = "User 1" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var account2 = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "user2@test.com", Name = "User 2" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
-        var account3 = new Account
-        {
-            Id = Guid.NewGuid(),
-            User = new User { Id = Guid.NewGuid(), Email = "user3@test.com", Name = "User 3" },
-            Balance = 1000m,
-            Withdrawn = 0m,
-            PaidIn = 0m
-        };
+        var account1 = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "user1@test.com", Name = "User 1" }, 1000m, 0m, 0m);
+        var account2 = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "user2@test.com", Name = "User 2" }, 1000m, 0m, 0m);
+        var account3 = new Account(Guid.NewGuid(), new User { Id = Guid.NewGuid(), Email = "user3@test.com", Name = "User 3" }, 1000m, 0m, 0m);
         _accountRepository.AddAccount(account1);
         _accountRepository.AddAccount(account2);
         _accountRepository.AddAccount(account3);
@@ -270,3 +186,8 @@ public class InMemoryAccountRepository : IAccountRepository
         }
     }
 }
+
+
+
+
+

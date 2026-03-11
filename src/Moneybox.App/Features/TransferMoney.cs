@@ -9,17 +9,17 @@ public class TransferMoney(IAccountRepository accountRepository, INotificationSe
 {
     public void Execute(Guid fromAccountId, Guid toAccountId, decimal amount)
     {
-        Account from = accountRepository.GetAccountById(fromAccountId);
-        Account to = accountRepository.GetAccountById(toAccountId);
+        var from = accountRepository.GetAccountById(fromAccountId);
+        var to = accountRepository.GetAccountById(toAccountId);
 
-        var hasLowFunds = from.Withdraw(amount);
-        if (hasLowFunds)
+        from.Withdraw(amount);
+        if (from.HasLowBalance)
         {
             notificationService.NotifyFundsLow(from.User.Email);
         }
 
-        var isApproachingPayInLimit = to.Deposit(amount);
-        if (isApproachingPayInLimit)
+        to.Deposit(amount);
+        if (to.IsApproachingPayInLimit)
         {
             notificationService.NotifyApproachingPayInLimit(to.User.Email);
         }

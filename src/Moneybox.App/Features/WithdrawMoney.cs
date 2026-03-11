@@ -9,11 +9,11 @@ public class WithdrawMoney(IAccountRepository accountRepository, INotificationSe
 {
     public void Execute(Guid fromAccountId, decimal amount)
     {
-        Account account = accountRepository.GetAccountById(fromAccountId);
+        var account = accountRepository.GetAccountById(fromAccountId);
 
-        bool hasLowFunds = account.Withdraw(amount);
+        account.Withdraw(amount);
 
-        if (hasLowFunds)
+        if (account.HasLowBalance)
         {
             notificationService.NotifyFundsLow(account.User.Email);
         }
