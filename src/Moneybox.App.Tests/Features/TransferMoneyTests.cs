@@ -24,12 +24,11 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_SuccessfulTransfer_UpdatesBothAccounts()
+    public void GivenSufficientFunds_WhenTransferringMoney_ThenBothAccountsAreUpdated()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
-
         var fromAccount = new Account
         {
             Id = fromAccountId,
@@ -38,7 +37,6 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var toAccount = new Account
         {
             Id = toAccountId,
@@ -47,7 +45,6 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 1000m
         };
-
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
@@ -59,7 +56,6 @@ public class TransferMoneyTests
         Assert.AreEqual(300m, fromAccount.Withdrawn);
         Assert.AreEqual(800m, toAccount.Balance);
         Assert.AreEqual(1300m, toAccount.PaidIn);
-        
         _mockAccountRepository.Verify(x => x.Update(fromAccount), Times.Once);
         _mockAccountRepository.Verify(x => x.Update(toAccount), Times.Once);
         _mockNotificationService.Verify(x => x.NotifyFundsLow(It.IsAny<string>()), Times.Never);
@@ -67,13 +63,12 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_FromAccountBalanceFallsBelow500_SendsLowFundsNotification()
+    public void GivenBalanceWillFallBelow500_WhenTransferringMoney_ThenLowFundsNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
         var fromEmail = "from@test.com";
-
         var fromAccount = new Account
         {
             Id = fromAccountId,
@@ -82,7 +77,6 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var toAccount = new Account
         {
             Id = toAccountId,
@@ -91,7 +85,6 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 1000m
         };
-
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
@@ -104,7 +97,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_FromAccountExactly500_DoesNotSendLowFundsNotification()
+    public void GivenBalanceWillBeExactly500_WhenTransferringMoney_ThenNoLowFundsNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -140,7 +133,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_ToAccountApproachingPayInLimit_SendsPayInLimitNotification()
+    public void GivenPayInWillBeWithin500OfLimit_WhenTransferringMoney_ThenPayInLimitNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -177,7 +170,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_ToAccountExactly500FromLimit_DoesNotSendNotification()
+    public void GivenPayInWillBeExactly500FromLimit_WhenTransferringMoney_ThenNoPayInLimitNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -213,7 +206,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_BothThresholdsTriggered_SendsBothNotifications()
+    public void GivenBothThresholdsWillBeTriggered_WhenTransferringMoney_ThenBothNotificationsAreSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -253,7 +246,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_InsufficientFunds_ThrowsException()
+    public void GivenInsufficientFunds_WhenTransferringMoney_ThenInvalidOperationExceptionIsThrown()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -288,12 +281,11 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_InsufficientFunds_DoesNotUpdateAccounts()
+    public void GivenInsufficientFunds_WhenTransferAttempted_ThenAccountsAreNotUpdated()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
-
         var fromAccount = new Account
         {
             Id = fromAccountId,
@@ -302,7 +294,6 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var toAccount = new Account
         {
             Id = toAccountId,
@@ -311,7 +302,6 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 1000m
         };
-
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
@@ -325,14 +315,14 @@ public class TransferMoneyTests
             // Expected exception
         }
 
-        // Assert - Balances should not change
+        // Assert
         Assert.AreEqual(100m, fromAccount.Balance);
         Assert.AreEqual(500m, toAccount.Balance);
         _mockAccountRepository.Verify(x => x.Update(It.IsAny<Account>()), Times.Never);
     }
 
     [TestMethod]
-    public void Execute_PayInLimitExceeded_ThrowsException()
+    public void GivenPayInLimitWillBeExceeded_WhenTransferringMoney_ThenInvalidOperationExceptionIsThrown()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -367,7 +357,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_PayInLimitExceeded_DoesNotUpdateAccounts()
+    public void GivenPayInLimitWillBeExceeded_WhenTransferAttempted_ThenFromAccountIsModifiedButRepositoryNotUpdated()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -413,7 +403,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_ExactlyAtPayInLimit_SucceedsAndSendsNotification()
+    public void GivenPayInWillBeExactlyAtLimit_WhenTransferringMoney_ThenTransferSucceedsAndNotificationIsSent()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -452,7 +442,7 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_LoadsBothAccountsFromRepository()
+    public void GivenTwoAccounts_WhenTransferringMoney_ThenBothAccountsAreLoadedFromRepository()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
@@ -488,11 +478,10 @@ public class TransferMoneyTests
     }
 
     [TestMethod]
-    public void Execute_TransferToSelf_WorksCorrectly()
+    public void GivenSameFromAndToAccount_WhenTransferringMoney_ThenWithdrawnAndPaidInBothIncrease()
     {
         // Arrange
         var accountId = Guid.NewGuid();
-
         var account = new Account
         {
             Id = accountId,
@@ -501,25 +490,23 @@ public class TransferMoneyTests
             Withdrawn = 100m,
             PaidIn = 1000m
         };
-
         _mockAccountRepository.Setup(x => x.GetAccountById(accountId)).Returns(account);
 
         // Act
         _transferMoney.Execute(accountId, accountId, 100m);
 
-        // Assert - Withdrawn and PaidIn both increase
-        Assert.AreEqual(2000m, account.Balance); // No net change
-        Assert.AreEqual(200m, account.Withdrawn); // 100 + 100
-        Assert.AreEqual(1100m, account.PaidIn); // 1000 + 100
+        // Assert
+        Assert.AreEqual(2000m, account.Balance);
+        Assert.AreEqual(200m, account.Withdrawn);
+        Assert.AreEqual(1100m, account.PaidIn);
     }
 
     [TestMethod]
-    public void Execute_ZeroAmount_CompletesSuccessfully()
+    public void GivenZeroAmount_WhenTransferringMoney_ThenTransferCompletesWithoutChangingBalances()
     {
         // Arrange
         var fromAccountId = Guid.NewGuid();
         var toAccountId = Guid.NewGuid();
-
         var fromAccount = new Account
         {
             Id = fromAccountId,
@@ -528,7 +515,6 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var toAccount = new Account
         {
             Id = toAccountId,
@@ -537,14 +523,13 @@ public class TransferMoneyTests
             Withdrawn = 0m,
             PaidIn = 1000m
         };
-
         _mockAccountRepository.Setup(x => x.GetAccountById(fromAccountId)).Returns(fromAccount);
         _mockAccountRepository.Setup(x => x.GetAccountById(toAccountId)).Returns(toAccount);
 
         // Act
         _transferMoney.Execute(fromAccountId, toAccountId, 0m);
 
-        // Assert - No changes
+        // Assert
         Assert.AreEqual(1000m, fromAccount.Balance);
         Assert.AreEqual(500m, toAccount.Balance);
         _mockAccountRepository.Verify(x => x.Update(It.IsAny<Account>()), Times.Exactly(2));

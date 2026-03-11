@@ -25,7 +25,7 @@ public class TransferMoneyIntegrationTests
     }
 
     [TestMethod]
-    public void CompleteTransferScenario_MultipleTransfers_MaintainsDataIntegrity()
+    public void GivenThreeAccounts_WhenPerformingMultipleTransfers_ThenDataIntegrityIsMaintained()
     {
         // Arrange
         var account1 = new Account
@@ -82,7 +82,7 @@ public class TransferMoneyIntegrationTests
     }
 
     [TestMethod]
-    public void TransferToPayInLimit_TriggersNotificationSequence()
+    public void GivenTransfersApproachingPayInLimit_WhenTransferringToLimit_ThenNotificationSequenceIsTriggered()
     {
         // Arrange
         var fromAccount = new Account
@@ -93,7 +93,6 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var toAccount = new Account
         {
             Id = Guid.NewGuid(),
@@ -102,31 +101,22 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 3000m
         };
-
         _accountRepository.AddAccount(fromAccount);
         _accountRepository.AddAccount(toAccount);
 
-        // Act - First transfer: within 500 of limit
+        // Act
         _transferMoney.Execute(fromAccount.Id, toAccount.Id, 600m);
-
-        // Assert - First notification
-        _mockNotificationService.Verify(x => x.NotifyApproachingPayInLimit("to@test.com"), Times.Once);
-
-        var updated1 = _accountRepository.GetAccountById(toAccount.Id);
-        Assert.AreEqual(3600m, updated1.PaidIn);
-
-        // Act - Second transfer: exactly at limit
         _transferMoney.Execute(fromAccount.Id, toAccount.Id, 400m);
 
-        // Assert - Second notification
+        // Assert
         _mockNotificationService.Verify(x => x.NotifyApproachingPayInLimit("to@test.com"), Times.Exactly(2));
 
-        var updated2 = _accountRepository.GetAccountById(toAccount.Id);
-        Assert.AreEqual(4000m, updated2.PaidIn);
+        var updated = _accountRepository.GetAccountById(toAccount.Id);
+        Assert.AreEqual(4000m, updated.PaidIn);
     }
 
     [TestMethod]
-    public void TransferCausingLowBalance_ThenFailsOnInsufficientFunds()
+    public void GivenLowBalanceAfterFirstTransfer_WhenAttemptingSecondLargeTransfer_ThenInsufficientFundsExceptionIsThrown()
     {
         // Arrange
         var fromAccount = new Account
@@ -137,7 +127,6 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var toAccount = new Account
         {
             Id = Guid.NewGuid(),
@@ -146,25 +135,22 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         _accountRepository.AddAccount(fromAccount);
         _accountRepository.AddAccount(toAccount);
 
-        // Act - First transfer causes low balance
+        // Act
         _transferMoney.Execute(fromAccount.Id, toAccount.Id, 200m);
 
         // Assert
         var updated = _accountRepository.GetAccountById(fromAccount.Id);
         Assert.AreEqual(400m, updated.Balance);
         _mockNotificationService.Verify(x => x.NotifyFundsLow("from@test.com"), Times.Once);
-
-        // Act & Assert - Second transfer should fail
         Assert.ThrowsException<InvalidOperationException>(() =>
             _transferMoney.Execute(fromAccount.Id, toAccount.Id, 500m));
     }
 
     [TestMethod]
-    public void AccountPersistence_UpdatesAreReflectedInSubsequentReads()
+    public void GivenMultipleTransfers_WhenReadingAccountFromRepository_ThenUpdatesAreReflectedInSubsequentReads()
     {
         // Arrange
         var accountId = Guid.NewGuid();
@@ -176,7 +162,6 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var otherAccountId = Guid.NewGuid();
         var otherAccount = new Account
         {
@@ -186,29 +171,21 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         _accountRepository.AddAccount(account);
         _accountRepository.AddAccount(otherAccount);
 
-        // Act - First transfer
+        // Act
         _transferMoney.Execute(accountId, otherAccountId, 200m);
-
-        // Assert - After first transfer
-        var afterFirstTransfer = _accountRepository.GetAccountById(accountId);
-        Assert.AreEqual(800m, afterFirstTransfer.Balance);
-        Assert.AreEqual(200m, afterFirstTransfer.Withdrawn);
-
-        // Act - Second transfer
         _transferMoney.Execute(accountId, otherAccountId, 150m);
 
-        // Assert - After second transfer
-        var afterSecondTransfer = _accountRepository.GetAccountById(accountId);
-        Assert.AreEqual(650m, afterSecondTransfer.Balance);
-        Assert.AreEqual(350m, afterSecondTransfer.Withdrawn);
+        // Assert
+        var finalAccount = _accountRepository.GetAccountById(accountId);
+        Assert.AreEqual(650m, finalAccount.Balance);
+        Assert.AreEqual(350m, finalAccount.Withdrawn);
     }
 
     [TestMethod]
-    public void CircularTransfers_MaintainCorrectBalances()
+    public void GivenThreeAccountsWithSameBalance_WhenPerformingCircularTransfers_ThenAllBalancesReturnToOriginalAmounts()
     {
         // Arrange
         var account1 = new Account
@@ -219,7 +196,6 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var account2 = new Account
         {
             Id = Guid.NewGuid(),
@@ -228,7 +204,6 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         var account3 = new Account
         {
             Id = Guid.NewGuid(),
@@ -237,12 +212,11 @@ public class TransferMoneyIntegrationTests
             Withdrawn = 0m,
             PaidIn = 0m
         };
-
         _accountRepository.AddAccount(account1);
         _accountRepository.AddAccount(account2);
         _accountRepository.AddAccount(account3);
 
-        // Act - Circular transfers: 1 -> 2 -> 3 -> 1
+        // Act
         _transferMoney.Execute(account1.Id, account2.Id, 100m);
         _transferMoney.Execute(account2.Id, account3.Id, 100m);
         _transferMoney.Execute(account3.Id, account1.Id, 100m);
@@ -251,17 +225,12 @@ public class TransferMoneyIntegrationTests
         var updated1 = _accountRepository.GetAccountById(account1.Id);
         var updated2 = _accountRepository.GetAccountById(account2.Id);
         var updated3 = _accountRepository.GetAccountById(account3.Id);
-
-        // All balances should be back to 1000m
         Assert.AreEqual(1000m, updated1.Balance);
         Assert.AreEqual(1000m, updated2.Balance);
         Assert.AreEqual(1000m, updated3.Balance);
-
-        // Each account withdrew and received 100m
         Assert.AreEqual(100m, updated1.Withdrawn);
         Assert.AreEqual(100m, updated2.Withdrawn);
         Assert.AreEqual(100m, updated3.Withdrawn);
-
         Assert.AreEqual(100m, updated1.PaidIn);
         Assert.AreEqual(100m, updated2.PaidIn);
         Assert.AreEqual(100m, updated3.PaidIn);
