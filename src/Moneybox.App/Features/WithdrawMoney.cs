@@ -5,19 +5,31 @@ using Moneybox.App.Domain;
 using Moneybox.App.Domain.Services;
 using System;
 
-public class WithdrawMoney(IAccountRepository accountRepository, INotificationService notificationService)
+public class WithdrawMoney(IAccountRepository accountRepository, INotificationService notificationService, IUnitOfWork unitOfWork)
 {
     public void Execute(Guid fromAccountId, decimal amount)
     {
-        var account = accountRepository.GetAccountById(fromAccountId);
-
-        account.Withdraw(amount);
-
-        if (account.HasLowBalance)
+        try
         {
-            notificationService.NotifyFundsLow(account.User.Email);
-        }
+            unitOfWork.BeginTransaction();
 
-        accountRepository.Update(account);
+            var account = accountRepository.GetAccountById(fromAccountId);
+
+            account.Withdraw(amount);
+
+            accountRepository.Update(account);
+
+            unitOfWork.Commit();
+
+            if (account.HasLowBalance)
+            {
+                notificationService.NotifyFundsLow(account.User.Email);
+            }
+        }
+        catch
+        {
+            unitOfWork.Rollback();
+            throw;
+        }
     }
 }

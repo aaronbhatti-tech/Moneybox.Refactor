@@ -5,26 +5,39 @@ using Moneybox.App.Domain;
 using Moneybox.App.Domain.Services;
 using System;
 
-public class TransferMoney(IAccountRepository accountRepository, INotificationService notificationService)
+public class TransferMoney(IAccountRepository accountRepository, INotificationService notificationService, IUnitOfWork unitOfWork)
 {
     public void Execute(Guid fromAccountId, Guid toAccountId, decimal amount)
     {
-        var from = accountRepository.GetAccountById(fromAccountId);
-        var to = accountRepository.GetAccountById(toAccountId);
-
-        from.Withdraw(amount);
-        if (from.HasLowBalance)
+        try
         {
-            notificationService.NotifyFundsLow(from.User.Email);
-        }
+            unitOfWork.BeginTransaction();
 
-        to.Deposit(amount);
-        if (to.IsApproachingPayInLimit)
+            var from = accountRepository.GetAccountById(fromAccountId);
+            var to = accountRepository.GetAccountById(toAccountId);
+
+            from.Withdraw(amount);
+            to.Deposit(amount);
+
+            accountRepository.Update(from);
+            accountRepository.Update(to);
+
+            unitOfWork.Commit();
+
+            if (from.HasLowBalance)
+            {
+                notificationService.NotifyFundsLow(from.User.Email);
+            }
+
+            if (to.IsApproachingPayInLimit)
+            {
+                notificationService.NotifyApproachingPayInLimit(to.User.Email);
+            }
+        }
+        catch
         {
-            notificationService.NotifyApproachingPayInLimit(to.User.Email);
+            unitOfWork.Rollback();
+            throw;
         }
-
-        accountRepository.Update(from);
-        accountRepository.Update(to);
     }
 }
